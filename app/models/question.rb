@@ -22,7 +22,23 @@ class Question < ActiveRecord::Base
     source: :responses
   )
 
-  def something
+  def second_result
+    question_results = {}
 
+    answer_choices.includes(:responses).each do |answer|
+      question_results[answer.choice] = answer.responses.length
+    end
+
+    question_results
+  end
+
+  def first_results
+    question_results = {}
+
+    answer_choices.each do |answer|
+      question_results[answer.choice] = answer.responses.count
+    end
+
+    question_results
   end
 end
