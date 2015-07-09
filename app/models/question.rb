@@ -15,4 +15,14 @@ class Question < ActiveRecord::Base
     foreign_key: :poll_id,
     primary_key: :id
   )
+
+  has_many(
+    :responses,
+    through: :answer_choices,
+    source: :responses
+  )
+
+  def something
+
+  end
 end
