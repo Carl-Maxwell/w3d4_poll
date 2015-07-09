@@ -22,23 +22,18 @@ class Question < ActiveRecord::Base
     source: :responses
   )
 
-  def second_result
-    question_results = {}
-
-    answer_choices.includes(:responses).each do |answer|
-      question_results[answer.choice] = answer.responses.length
-    end
-
-    question_results
-  end
-
-  def first_results
-    question_results = {}
-
-    answer_choices.each do |answer|
-      question_results[answer.choice] = answer.responses.count
-    end
-
-    question_results
+  def results
+    Question.find_by_sql([<<-SQL, self.id])
+      SELECT
+        answer_choices.*, COUNT(responses.*) AS num_responses
+      FROM
+        answer_choices
+      LEFT OUTER JOIN
+        responses ON answer_choices.id = responses.answer_choice_id
+      WHERE
+        answer_choices.question_id = ?
+      GROUP BY
+        answer_choices.id
+    SQL
   end
 end
